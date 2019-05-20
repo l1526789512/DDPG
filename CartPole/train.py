@@ -53,7 +53,7 @@ for i in range(MAX_EPISODES):
 
         # Add exploration noise
         a = agent.actor.choose_action(s)
-        a = np.clip(np.random.normal(a, var), -2, 2)    # add randomness to action selection for exploration
+        #a = np.clip(np.random.normal(a, var), -2, 2)    # add randomness to action selection for exploration
         s_, r, done, info = env.step(a)
 
         agent.memory.store_transition(s, a, r / 10, s_)

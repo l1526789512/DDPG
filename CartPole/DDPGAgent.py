@@ -37,9 +37,11 @@ class Actor(object):
                                   kernel_initializer=init_w, bias_initializer=init_b, name='l1',
                                   trainable=trainable)
             with tf.variable_scope('a'):
-                actions = tf.layers.dense(net, self.a_dim, activation=tf.nn.tanh, kernel_initializer=init_w,
+                actions = tf.layers.dense(net, self.a_dim, activation=tf.nn.softmax, kernel_initializer=init_w,
                                           bias_initializer=init_b, name='a', trainable=trainable)
                 #scaled_a = tf.multiply(actions, self.action_bound, name='scaled_a')  # Scale output to -action_bound to action_bound
+        print("action:")
+        print(actions)
         return actions
 
     def learn(self, s):   # batch update
@@ -160,7 +162,7 @@ class Agent(object):
     def __init__(self,sess, action_dim, learning_rate_a,learning_rate_c, replacement, state_dim,gamma,buffer_cap):
         with tf.name_scope('S'):
             self.S = tf.placeholder(tf.float32, shape=[None, state_dim], name='s')
-        with tf.name_scope('R'):import tensorflow as tfimport tensorflow as tf
+        with tf.name_scope('R'):
             self.R = tf.placeholder(tf.float32, [None, 1], name='r')
         with tf.name_scope('S_'):
             self.S_ = tf.placeholder(tf.float32, shape=[None, state_dim], name='s_')
