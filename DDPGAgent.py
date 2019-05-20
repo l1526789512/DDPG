@@ -3,17 +3,15 @@ import numpy as np
 
 
 class Actor(object):
-    def __init__(self, sess, action_dim, action_bound, learning_rate, replacement, state_dim):
+    def __init__(self, sess, S, S_,action_dim, action_bound, learning_rate, replacement, state_dim):
         self.sess = sess
         self.a_dim = action_dim
         self.action_bound = action_bound
         self.lr = learning_rate
         self.replacement = replacement
         self.t_replace_counter = 0
-        with tf.name_scope('S'):
-            self.S = tf.placeholder(tf.float32, shape=[None, state_dim], name='s')
-        with tf.name_scope('S_'):
-            self.S_ = tf.placeholder(tf.float32, shape=[None, state_dim], name='s_')
+        self.S = S
+        self.S_ = S_
 
         with tf.variable_scope('Actor'):
             # input s, output a
@@ -73,19 +71,16 @@ class Actor(object):
 
 
 class Critic(object):
-    def __init__(self, sess, state_dim, action_dim, learning_rate, gamma, replacement, a, a_):
+    def __init__(self,sess, S, S_,R, state_dim, action_dim, learning_rate, gamma, replacement, a, a_):
         self.sess = sess
         self.s_dim = state_dim
         self.a_dim = action_dim
         self.lr = learning_rate
         self.gamma = gamma
         self.replacement = replacement
-        with tf.name_scope('S'):
-            self.S = tf.placeholder(tf.float32, shape=[None, state_dim], name='s')
-        with tf.name_scope('R'):
-            self.R = tf.placeholder(tf.float32, [None, 1], name='r')
-        with tf.name_scope('S_'):
-            self.S_ = tf.placeholder(tf.float32, shape=[None, state_dim], name='s_')
+        self.S = S
+        self.S_ = S_
+        self.R = R
 
         with tf.variable_scope('Critic'):
             # Input (s, a), output q
@@ -164,6 +159,12 @@ class Memory(object):
 
 class Agent(object):
     def __init__(self,sess, action_dim, action_bound, learning_rate_a,learning_rate_c, replacement, state_dim,gamma,buffer_cap):
-        self.actor = Actor(sess, action_dim, action_bound, learning_rate_a, replacement, state_dim)
-        self.critic = Critic(sess, state_dim, action_dim, learning_rate_c, gamma, replacement, self.actor.a, self.actor.a_)
+        with tf.name_scope('S'):
+            self.S = tf.placeholder(tf.float32, shape=[None, state_dim], name='s')
+        with tf.name_scope('R'):
+            self.R = tf.placeholder(tf.float32, [None, 1], name='r')
+        with tf.name_scope('S_'):
+            self.S_ = tf.placeholder(tf.float32, shape=[None, state_dim], name='s_')
+        self.actor = Actor(sess, self.S,self.S_,action_dim, action_bound, learning_rate_a, replacement, state_dim)
+        self.critic = Critic(sess, self.S,self.S_,self.R,state_dim, action_dim, learning_rate_c, gamma, replacement, self.actor.a, self.actor.a_)
         self.memory = Memory(buffer_cap, 2 * state_dim + action_dim + 1)
