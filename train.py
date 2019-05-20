@@ -38,6 +38,7 @@ agent = Agent(
     sess,action_dim, action_bound, LR_A,LR_C, REPLACEMENT,
     state_dim,GAMMA,MEMORY_CAPACITY
 )
+sess.run(tf.global_variables_initializer())
 
 var = 3 # control exploration
 t1 = time.time()

@@ -161,10 +161,11 @@ class Agent(object):
     def __init__(self,sess, action_dim, action_bound, learning_rate_a,learning_rate_c, replacement, state_dim,gamma,buffer_cap):
         with tf.name_scope('S'):
             self.S = tf.placeholder(tf.float32, shape=[None, state_dim], name='s')
-        with tf.name_scope('R'):
+        with tf.name_scope('R'):import tensorflow as tfimport tensorflow as tf
             self.R = tf.placeholder(tf.float32, [None, 1], name='r')
         with tf.name_scope('S_'):
             self.S_ = tf.placeholder(tf.float32, shape=[None, state_dim], name='s_')
         self.actor = Actor(sess, self.S,self.S_,action_dim, action_bound, learning_rate_a, replacement, state_dim)
         self.critic = Critic(sess, self.S,self.S_,self.R,state_dim, action_dim, learning_rate_c, gamma, replacement, self.actor.a, self.actor.a_)
         self.memory = Memory(buffer_cap, 2 * state_dim + action_dim + 1)
+        self.actor.add_grad_to_graph(self.critic.a_grads)
